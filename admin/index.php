@@ -1,0 +1,75 @@
+<?php
+
+declare(strict_types=1);
+require_once __DIR__ . '/_bootstrap.php';
+require_admin();
+$pageTitle = 'Dashboard';
+$active = 'dashboard';
+$stats = [];
+$recentOrders = [];
+$recentMessages = [];
+$stats['orders'] = (int)$pdo->query('SELECT COUNT(*) FROM orders')->fetchColumn();
+$stats['new'] = (int)$pdo->query("SELECT COUNT(*) FROM orders WHERE status='new'")->fetchColumn();
+$stats['value'] = (float)$pdo->query('SELECT COALESCE(SUM(total_amount),0) FROM orders WHERE status<>\'cancelled\'')->fetchColumn();
+$stats['messages'] = (int)$pdo->query("SELECT COUNT(*) FROM contact_messages WHERE status='unread'")->fetchColumn();
+$recentOrders = $pdo->query('SELECT id,order_ref,fullname,fabric_type,quantity,total_amount,status,created_at FROM orders ORDER BY id DESC LIMIT 8')->fetchAll();
+$recentMessages = $pdo->query('SELECT id,fullname,message,status,created_at FROM contact_messages ORDER BY id DESC LIMIT 5')->fetchAll();
+require __DIR__ . '/includes/layout.php'; ?>
+<div class="stat-grid">
+    <div class="stat"><small>Total orders</small><b><?= $stats['orders'] ?></b></div>
+    <div class="stat"><small>New orders</small><b><?= $stats['new'] ?></b></div>
+    <div class="stat"><small>Order value</small><b><?= money($stats['value']) ?></b></div>
+    <div class="stat"><small>Unread messages</small><b><?= $stats['messages'] ?></b></div>
+</div>
+<div class="panel">
+    <div class="panel-head">
+        <h2>Recent orders</h2><a class="btn btn-light" href="orders.php">Manage orders</a>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>Customer</th>
+                    <th>Fabric</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody><?php foreach ($recentOrders as $o): ?><tr>
+                        <td><?= e($o['order_ref']) ?></td>
+                        <td><?= e($o['fullname']) ?></td>
+                        <td><?= e($o['fabric_type']) ?></td>
+                        <td><?= e($o['quantity']) ?></td>
+                        <td><?= money($o['total_amount']) ?></td>
+                        <td><span class="badge <?= e($o['status']) ?>"><?= e($o['status']) ?></span></td>
+                        <td><a href="order.php?id=<?= (int)$o['id'] ?>">View</a></td>
+                    </tr><?php endforeach; ?></tbody>
+        </table>
+    </div>
+</div>
+<div class="panel">
+    <div class="panel-head">
+        <h2>Latest messages</h2><a class="btn btn-light" href="contacts.php">View messages</a>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody><?php foreach ($recentMessages as $m): ?><tr>
+                        <td><?= e($m['fullname']) ?></td>
+                        <td><?= e(mb_strimwidth($m['message'], 0, 80, '…')) ?></td>
+                        <td><span class="badge <?= e($m['status']) ?>"><?= e($m['status']) ?></span></td>
+                        <td><?= e($m['created_at']) ?></td>
+                    </tr><?php endforeach; ?></tbody>
+        </table>
+    </div>
+</div><?php require __DIR__ . '/includes/footer.php'; ?>
