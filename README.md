@@ -28,7 +28,7 @@ A professional responsive PHP/MySQL/Tailwind/JavaScript fabric store with a secu
 5. Ensure `assets/uploads/media`, `assets/uploads/products`, and `assets/uploads/slides` are writable by PHP.
 
 ## Existing database
-If upgrading the previous application, run `database/migration.sql` once. If your previous migration already added the new product columns, skip duplicate ALTER statements and only create `gallery_media`.
+If upgrading the previous application, run `database/migration.sql` once. If your previous migration already added the new product columns
 
 ## Media
 Photos support JPG, PNG and WEBP. Videos support MP4, WEBM and OGG. Admin uploads are stored under `assets/uploads/media/`. The public gallery is fully responsive and can filter Photos/Videos.
