@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1); require_once __DIR__.'/_bootstrap.php';
+declare(strict_types=1); require __DIR__.'/_bootstrap.php';
 if(logged()) redirect_to('index.php');
 $error=''; $expired=isset($_GET['expired']);
 if(is_post()){verify_csrf($_POST['csrf']??'');$u=trim((string)($_POST['username']??''));$p=(string)($_POST['password']??'');$ip=$_SERVER['REMOTE_ADDR']??'unknown';

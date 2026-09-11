@@ -1,9 +1,12 @@
 <?php
 declare(strict_types=1);
-function benaki_env(string $key, string $default=''): string {
-    $value = getenv($key);
-    return ($value === false || $value === '') ? $default : (string)$value;
+if (!function_exists('benaki_env')) {
+    function benaki_env(string $key, string $default=''): string {
+        $value = getenv($key);
+        return ($value === false || $value === '') ? $default : (string)$value;
+    }
 }
+
 return [
     'db' => [
         'host' => benaki_env('BENAKI_DB_HOST','127.0.0.1'),
@@ -24,6 +27,11 @@ return [
         'phone1' => '08133314846', 'phone2' => '09069351146', 'whatsapp' => '2348133314846',
         'email' => benaki_env('BENAKI_BUSINESS_EMAIL',''), 'location' => 'Calabar, Cross River State',
         'delivery' => 'South East & South South Nigeria',
+    ],
+    'paystack' => [
+        'public_key' => benaki_env('PAYSTACK_PUBLIC_KEY',''),
+        'secret_key' => benaki_env('PAYSTACK_SECRET_KEY',''),
+        'currency' => 'NGN',
     ],
     'admin' => [
         'setup_key' => benaki_env('BENAKI_ADMIN_SETUP_KEY','CHANGE-ME-BEFORE-PRODUCTION'),

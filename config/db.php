@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-$config = require_once __DIR__ . '/config.php';
+$config = require __DIR__ . '/config.php';
 $db = $config['db'] ?? [];
 $dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s', $db['host'] ?? '127.0.0.1', $db['name'] ?? 'benaki_fabrics', $db['charset'] ?? 'utf8mb4');
 try {

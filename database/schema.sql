@@ -28,9 +28,15 @@ CREATE TABLE IF NOT EXISTS orders (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, order_ref VARCHAR(32) NOT NULL UNIQUE, product_id BIGINT UNSIGNED NULL, fabric_type VARCHAR(120) NOT NULL,
  colors TEXT NOT NULL, measurement ENUM('yard','trouser_length') NOT NULL, quantity DECIMAL(10,2) NOT NULL, unit_price DECIMAL(12,2) NOT NULL,
  subtotal DECIMAL(12,2) NOT NULL, discount DECIMAL(12,2) NOT NULL DEFAULT 0, total_amount DECIMAL(12,2) NOT NULL,
- fullname VARCHAR(120) NOT NULL, phone VARCHAR(50) NOT NULL, location VARCHAR(200) NOT NULL, description TEXT NULL,
- status ENUM('new','contacted','completed','cancelled') NOT NULL DEFAULT 'new', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ fullname VARCHAR(120) NOT NULL, phone VARCHAR(50) NOT NULL, email VARCHAR(160) NULL, location VARCHAR(200) NOT NULL, description TEXT NULL,
+ status ENUM('new','contacted','completed','cancelled') NOT NULL DEFAULT 'new', payment_status ENUM('unpaid','pending','paid','failed','refunded') NOT NULL DEFAULT 'unpaid', paystack_reference VARCHAR(120) NULL, paystack_transaction_id BIGINT UNSIGNED NULL, paid_at DATETIME NULL, receipt_token CHAR(64) NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  INDEX idx_orders_status_created(status,created_at), CONSTRAINT fk_orders_product FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+CREATE UNIQUE INDEX uq_orders_paystack_ref ON orders(paystack_reference);
+CREATE UNIQUE INDEX uq_orders_receipt_token ON orders(receipt_token);
+CREATE INDEX idx_orders_payment ON orders(payment_status,created_at);
+CREATE TABLE IF NOT EXISTS order_items (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, order_id BIGINT UNSIGNED NOT NULL, product_id BIGINT UNSIGNED NULL, product_name VARCHAR(120) NOT NULL, colors TEXT NOT NULL, measurement ENUM('yard','trouser_length') NOT NULL, quantity DECIMAL(10,2) NOT NULL, unit_price DECIMAL(12,2) NOT NULL, line_total DECIMAL(12,2) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, INDEX idx_order_items_order(order_id), CONSTRAINT fk_order_items_order FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE, CONSTRAINT fk_order_items_product FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS contact_messages (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, fullname VARCHAR(120) NOT NULL, phone VARCHAR(50), email VARCHAR(160), message TEXT NOT NULL,

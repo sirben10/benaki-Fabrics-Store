@@ -35,3 +35,13 @@ Photos support JPG, PNG and WEBP. Videos support MP4, WEBM and OGG. Admin upload
 
 ## Architecture
 All SQL uses PDO prepared statements. The public site is multipage, while product pricing/order logic remains server validated.
+
+## Shopping cart + Paystack checkout
+
+The store now supports a full shopping flow: add multiple fabric lines to cart, update/remove items, checkout, server-side order creation, Paystack payment initialization, Paystack popup completion, server-side payment verification, and a protected printable receipt.
+
+1. Run `database/schema.sql` for a fresh database, or run `database/shop_migration.sql` once against an existing installation.
+2. Configure `PAYSTACK_PUBLIC_KEY` and `PAYSTACK_SECRET_KEY` in the server environment. Keep the secret key server-side only.
+3. Use Paystack test keys for local testing, then switch to live keys after completing Paystack activation and HTTPS setup.
+4. The backend initializes transactions and verifies the reference and amount on the server before marking an order paid. Paystack recommends server-side initialization and verification; the secret key must not be exposed in frontend code. See the official docs: https://paystack.com/docs/payments/accept-payments/ and https://paystack.com/docs/api/transaction/.
+5. Receipts are available only with the order reference plus a random receipt token, and can be printed/saved as PDF from the browser.

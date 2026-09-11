@@ -45,7 +45,7 @@ $navItems = [
           <a href="<?= e(base_url($path)) ?>" class="nav-link <?= $active === $key ? 'is-active' : '' ?>"><?= e($label) ?></a>
         <?php endforeach; ?>
       </nav>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2"><a href="<?= e(base_url('cart.php')) ?>" class="relative h-11 w-11 grid place-items-center rounded-xl border border-slate-200 text-benaki-navy hover:border-amber-400" aria-label="Shopping cart">🛒<span class="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-benaki-gold text-benaki-navy text-[10px] font-extrabold grid place-items-center"><?= e((string)cart_count()) ?></span></a>
         <a href="<?= e(base_url('fabrics.php')) ?>" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-benaki-navy font-bold text-xs hover:border-amber-400 transition">Browse Store</a>
         <a href="<?= e(base_url('fabrics.php')) ?>" class="order-cta inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-benaki-gold text-benaki-navy font-extrabold text-xs shadow-sm hover:shadow-md transition">Order Now <span aria-hidden="true">→</span></a>
         <button id="menuBtn" type="button" class="lg:hidden h-11 w-11 rounded-xl border border-slate-200 text-benaki-navy grid place-items-center" aria-expanded="false" aria-controls="mobileNav" aria-label="Open menu"><span class="hamburger"><i></i><i></i><i></i></span></button>

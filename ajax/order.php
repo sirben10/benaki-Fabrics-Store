@@ -16,7 +16,7 @@ if(mb_strlen($fullname)>120||mb_strlen($phone)>50||mb_strlen($location)>200||mb_
 try {
  $stmt=$pdo->prepare('SELECT id,name,yard_price,trouser_price FROM products WHERE id=? AND is_active=1 LIMIT 1'); $stmt->execute([$pid]); $product=$stmt->fetch(); if(!$product) respond(false,'The selected fabric is no longer available.');
  $unit=(float)($measurement==='yard'?$product['yard_price']:$product['trouser_price']); $subtotal=round($unit*$qty,2);
- $discount=0; if($qty>=5 && $qty<=9.5)$discount=1000; elseif($qty>9.5 && $qty<=14.5)$discount=1500; elseif($qty>14.5 && $qty<=30)$discount=2000; elseif($qty>30)$discount=3000; $total=max(0,$subtotal-$discount);
+ $discount=0; if($unit>=4000){if($qty>30)$discount=4500;elseif($qty>=20)$discount=3000;elseif($qty>=10)$discount=2000;elseif($qty>=5)$discount=1500;elseif($qty>=3)$discount=1000;}elseif($unit>=3000){if($qty>30)$discount=3500;elseif($qty>=20)$discount=2500;elseif($qty>=10)$discount=2000;elseif($qty>=5)$discount=1500;elseif($qty>=3)$discount=500;}else{if($qty>30)$discount=3000;elseif($qty>=20)$discount=2000;elseif($qty>=10)$discount=1500;elseif($qty>=5)$discount=1000;elseif($qty>=3)$discount=500;} $total=max(0,$subtotal-$discount);
  $ref='BF-'.date('ymd').'-'.strtoupper(bin2hex(random_bytes(3)));
  $stmt=$pdo->prepare('INSERT INTO orders(order_ref,product_id,fabric_type,colors,measurement,quantity,unit_price,subtotal,discount,total_amount,fullname,phone,location,description) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
  $stmt->execute([$ref,(int)$product['id'],$product['name'],json_encode($colors,JSON_UNESCAPED_UNICODE),$measurement,$qty,$unit,$subtotal,$discount,$total,$fullname,$phone,$location,$description?:null]);

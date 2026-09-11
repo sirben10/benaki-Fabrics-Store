@@ -9,7 +9,7 @@ function base_url(string $path=''): string {
     if($base===''){
         $script=(string)($_SERVER['SCRIPT_NAME']??'');
         $root=dirname($script);
-        if(str_ends_with($root,'/admin')) $root=dirname($root);
+        if(in_array(basename(str_replace('\\','/',$root)), ['admin','ajax','payment'], true)) $root=dirname($root);
         $base=($root==='.'||$root==='\\')?'':rtrim($root,'/');
     }
     return $base.'/'.ltrim($path,'/');
@@ -26,3 +26,72 @@ function csrf_token(): string { if(empty($_SESSION['csrf'])) $_SESSION['csrf']=b
 function verify_csrf(string $token): void { if(!hash_equals((string)($_SESSION['csrf']??''),$token)) { http_response_code(419); exit('Invalid security token.'); } }
 function is_post(): bool { return ($_SERVER['REQUEST_METHOD']??'GET')==='POST'; }
 function redirect_to(string $url): never { header('Location: '.$url); exit; }
+
+function cart_items(): array {
+    $cart = is_array($_SESSION['cart'] ?? null) ? $_SESSION['cart'] : [];
+    $normalized = [];
+    $changed = false;
+    foreach ($cart as $storedKey => $item) {
+        $colors = is_array($item['colors'] ?? null) ? array_values(array_unique(array_filter(array_map('trim', $item['colors'])))) : [];
+        if (count($colors) > 1) {
+            $changed = true;
+            foreach ($colors as $color) {
+                $copy = $item;
+                $copy['colors'] = [$color];
+                $copy['key'] = cart_key((int)$copy['product_id'], (string)$copy['measurement'], $color);
+                $normalized[$copy['key']] = $copy;
+            }
+        } else {
+            $copy = $item;
+            $copy['colors'] = $colors;
+            if (count($colors) === 1) $copy['key'] = cart_key((int)$copy['product_id'], (string)$copy['measurement'], $colors[0]);
+            $normalized[$copy['key'] ?? $storedKey] = $copy;
+        }
+    }
+    if ($changed) $_SESSION['cart'] = $normalized;
+    return $normalized;
+}
+function cart_count(): int { return count(cart_items()); }
+function cart_key(int $productId, string $measurement, string $color): string {
+    return sha1($productId.'|'.$measurement.'|'.strtolower(trim($color)));
+}
+function anniversary_discount(float $quantity, float $unitPrice = 0): float {
+    if ($unitPrice >= 4000) {
+        if ($quantity > 30) return 4500;
+        if ($quantity >= 20) return 3000;
+        if ($quantity >= 10) return 2000;
+        if ($quantity >= 5) return 1500;
+        if ($quantity >= 3) return 1000;
+        return 0;
+    }
+    if ($unitPrice >= 3000) {
+        if ($quantity > 30) return 3500;
+        if ($quantity >= 20) return 2500;
+        if ($quantity >= 10) return 2000;
+        if ($quantity >= 5) return 1500;
+        if ($quantity >= 3) return 500;
+        return 0;
+    }
+    if ($quantity > 30) return 3000;
+    if ($quantity >= 20) return 2000;
+    if ($quantity >= 10) return 1500;
+    if ($quantity >= 5) return 1000;
+    if ($quantity >= 3) return 500;
+    return 0;
+}
+function cart_total_quantity(array $cart): float {
+    $quantity = 0.0;
+    foreach ($cart as $item) {
+        $quantity += (float)($item['quantity'] ?? 0);
+    }
+    return $quantity;
+}
+
+function cart_discount(array $cart): float {
+    $discount = 0.0;
+    foreach ($cart as $item) {
+        $discount += anniversary_discount((float)($item['quantity'] ?? 0), (float)($item['unit_price'] ?? 0));
+    }
+    return $discount;
+}
+function paystack_config(): array { return $GLOBALS['config']['paystack'] ?? []; }

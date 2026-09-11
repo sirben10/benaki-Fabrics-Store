@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 if(session_status()!==PHP_SESSION_ACTIVE){session_name('BENAKI_ADMIN');session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>(!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off'),'httponly'=>true,'samesite'=>'Lax']);session_start();}
-require_once __DIR__.'/../config/db.php'; $config=require_once __DIR__.'/../config/config.php';
+require_once __DIR__.'/../config/db.php'; $config=require __DIR__.'/../config/config.php';
 header_remove('X-Powered-By'); header('X-Content-Type-Options:nosniff');header('X-Frame-Options:SAMEORIGIN');header('Referrer-Policy:strict-origin-when-cross-origin');header("Content-Security-Policy:default-src 'self' https://cdn.tailwindcss.com; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'");
 function e($v):string{return htmlspecialchars((string)$v,ENT_QUOTES,'UTF-8');} function redirect_to(string $p):never{header('Location:'.$p);exit;} function is_post():bool{return ($_SERVER['REQUEST_METHOD']??'GET')==='POST';}
 function csrf_token():string{if(empty($_SESSION['csrf']))$_SESSION['csrf']=bin2hex(random_bytes(32));return $_SESSION['csrf'];} function verify_csrf(?string $t):void{if(!$t||empty($_SESSION['csrf'])||!hash_equals($_SESSION['csrf'],$t)){http_response_code(419);exit('Invalid security token.');}}
