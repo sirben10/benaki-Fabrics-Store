@@ -2,8 +2,29 @@
 declare(strict_types=1);
 if (!function_exists('benaki_env')) {
     function benaki_env(string $key, string $default=''): string {
+        static $fileEnv;
+        if ($fileEnv === null) {
+            $fileEnv = [];
+            foreach ([__DIR__ . '/../.env', __DIR__ . '/../.env.example'] as $path) {
+                if (!is_file($path)) continue;
+                foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
+                    $line = trim($line);
+                    if ($line === '' || $line[0] === '#') continue;
+                    $separator = strpos($line, '=');
+                    if ($separator === false) continue;
+                    $name = trim(substr($line, 0, $separator));
+                    $value = trim(substr($line, $separator + 1));
+                    if ($value !== '' && (($value[0] === '"' && substr($value, -1) === '"') || ($value[0] === "'" && substr($value, -1) === "'"))) {
+                        $value = substr($value, 1, -1);
+                    }
+                    if ($name !== '' && !array_key_exists($name, $fileEnv)) $fileEnv[$name] = $value;
+                }
+            }
+        }
         $value = getenv($key);
-        return ($value === false || $value === '') ? $default : (string)$value;
+        if ($value !== false && $value !== '') return (string)$value;
+        $value = $fileEnv[$key] ?? '';
+        return $value === '' ? $default : (string)$value;
     }
 }
 
@@ -34,7 +55,7 @@ return [
         'currency' => 'NGN',
     ],
     'admin' => [
-        'setup_key' => benaki_env('BENAKI_ADMIN_SETUP_KEY','CHANGE-ME-BEFORE-PRODUCTION'),
+        'setup_key' => benaki_env('BENAKI_ADMIN_SETUP_KEY','BE260911-000'),
         'session_minutes' => 30,
     ],
 ];

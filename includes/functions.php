@@ -20,6 +20,13 @@ function site_url(string $url=''): string {
     if(preg_match('~^(https?:)?//|^(mailto:|tel:|#)~i',$url)) return $url;
     return base_url($url);
 }
+function absolute_site_url(string $url=''): string {
+    $target = site_url($url);
+    if (preg_match('~^https?://~i', $target)) return $target;
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = trim((string)($_SERVER['HTTP_HOST'] ?? ''));
+    return $host === '' ? $target : $scheme . '://' . $host . '/' . ltrim($target, '/');
+}
 function media_url(?string $path): string { if(!$path) return base_url('assets/img/fabric-stack.jpg'); return base_url($path); }
 function json_list(?string $v): array { if(!$v) return []; $a=json_decode($v,true); return is_array($a)?$a:[]; }
 function csrf_token(): string { if(empty($_SESSION['csrf'])) $_SESSION['csrf']=bin2hex(random_bytes(24)); return $_SESSION['csrf']; }

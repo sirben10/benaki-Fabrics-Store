@@ -1,1 +1,32 @@
-document.addEventListener('DOMContentLoaded',()=>{const f=document.getElementById('checkoutForm'),btn=document.getElementById('payBtn'),result=document.getElementById('checkoutResult');if(!f)return;f.addEventListener('submit',async e=>{e.preventDefault();btn.disabled=true;const original=btn.textContent;btn.textContent='Preparing secure payment…';result.textContent='';try{const r=await fetch(BENAKI_CHECKOUT.endpoint,{method:'POST',body:new FormData(f),headers:{Accept:'application/json','X-Requested-With':'XMLHttpRequest'},credentials:'same-origin'});const d=await r.json();if(!d.ok)throw new Error(d.message);if(typeof PaystackPop==='undefined')throw new Error('Paystack checkout could not load. Please refresh and try again.');const popup=new PaystackPop();popup.resumeTransaction(d.access_code);}catch(err){result.className='text-sm text-red-600';result.textContent=err.message||'Unable to start payment.';btn.disabled=false;btn.textContent=original;}});});
+document.addEventListener('DOMContentLoaded', () => {
+	const form = document.getElementById('checkoutForm');
+	const button = document.getElementById('payBtn');
+	const result = document.getElementById('checkoutResult');
+	if (!form) return;
+
+	form.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		button.disabled = true;
+		const originalLabel = button.textContent;
+		button.textContent = 'Preparing secure payment...';
+		result.textContent = '';
+
+		try {
+			const response = await fetch(BENAKI_CHECKOUT.endpoint, {
+				method: 'POST',
+				body: new FormData(form),
+				headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+				credentials: 'same-origin'
+			});
+			const data = await response.json();
+			if (!response.ok || !data.ok) throw new Error(data.message || 'Unable to initialize payment.');
+			if (!data.authorization_url) throw new Error('Paystack did not return a checkout URL.');
+			window.location.assign(data.authorization_url);
+		} catch (error) {
+			result.className = 'text-sm text-red-600';
+			result.textContent = error.message || 'Unable to start payment.';
+			button.disabled = false;
+			button.textContent = originalLabel;
+		}
+	});
+});
