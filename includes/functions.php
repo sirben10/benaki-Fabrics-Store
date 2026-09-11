@@ -29,6 +29,16 @@ function absolute_site_url(string $url=''): string {
 }
 function media_url(?string $path): string { if(!$path) return base_url('assets/img/fabric-stack.jpg'); return base_url($path); }
 function json_list(?string $v): array { if(!$v) return []; $a=json_decode($v,true); return is_array($a)?$a:[]; }
+function color_swatch(string $color): string {
+    $swatches = [
+        'white' => '#ffffff', 'cream' => '#f5e6c8', 'gold' => '#d4a017', 'yellow' => '#facc15',
+        'pink' => '#ec4899', 'purple' => '#8b5cf6', 'wine' => '#722f37', 'burgundy' => '#800020',
+        'red' => '#dc2626', 'blue' => '#2563eb', 'navy' => '#172554', 'green' => '#16a34a',
+        'teal' => '#0f766e', 'black' => '#111827', 'grey' => '#6b7280', 'gray' => '#6b7280',
+        'brown' => '#92400e',
+    ];
+    return $swatches[strtolower(trim($color))] ?? '#cbd5e1';
+}
 function csrf_token(): string { if(empty($_SESSION['csrf'])) $_SESSION['csrf']=bin2hex(random_bytes(24)); return $_SESSION['csrf']; }
 function verify_csrf(string $token): void { if(!hash_equals((string)($_SESSION['csrf']??''),$token)) { http_response_code(419); exit('Invalid security token.'); } }
 function is_post(): bool { return ($_SERVER['REQUEST_METHOD']??'GET')==='POST'; }

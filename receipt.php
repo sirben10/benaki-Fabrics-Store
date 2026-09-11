@@ -47,7 +47,17 @@ require __DIR__ . '/includes/header.php';
                         </thead>
                         <tbody><?php foreach ($items as $it): ?><tr class="border-t">
                                     <td class="p-3 font-bold"><?= e($it['product_name']) ?></td>
-                                    <td class="p-3 text-slate-500"><?= e(implode(', ', json_list($it['colors']))) ?> · <?= e($it['measurement'] === 'yard' ? 'Yard' : 'Trouser length') ?> · <?= e((string)$it['quantity']) ?></td>
+                                    <td class="p-3 text-slate-500">
+                                        <div class="flex flex-wrap gap-2 items-center">
+                                            <?php foreach (json_list($it['colors']) as $color): ?>
+                                                <span class="inline-flex items-center gap-1.5" title="<?= e((string)$color) ?>">
+                                                    <span class="inline-block w-4 h-4 rounded-full border border-slate-300 shadow-inner" style="background-color: <?= e(color_swatch((string)$color)) ?>" aria-hidden="true"></span>
+                                                    <span><?= e((string)$color) ?></span>
+                                                </span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <span class="block mt-1 text-xs text-slate-500"><?= e($it['measurement'] === 'yard' ? 'Yard' : 'Trouser length') ?> · <?= e((string)$it['quantity']) ?></span>
+                                    </td>
                                     <td class="p-3 text-right font-bold"><?= money((float)$it['line_total']) ?></td>
                                 </tr><?php endforeach; ?></tbody>
                     </table>
