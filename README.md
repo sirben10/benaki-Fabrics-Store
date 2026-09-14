@@ -31,7 +31,7 @@ A professional responsive PHP/MySQL/Tailwind/JavaScript fabric store with a secu
 If upgrading the previous application, run `database/migration.sql` once. If your previous migration already added the new product columns
 
 ## Media
-Photos support JPG, PNG and WEBP. Videos support MP4, WEBM and OGG. Admin uploads are stored under `assets/uploads/media/`. The public gallery is fully responsive and can filter Photos/Videos.
+Photos support JPG, PNG and WEBP. Videos support MP4, WEBM and OGG. Admin uploads are stored under `assets/uploads/media/` and are automatically reduced to 2 MB for one image, 10 MB total for multiple images, 3 MB for one video, or 15 MB total for multiple videos. FFmpeg must be available on the server, or configured with `BENAKI_FFMPEG_BIN`. The public gallery is fully responsive and can filter Photos/Videos.
 
 ## Architecture
 All SQL uses PDO prepared statements. The public site is multipage, while product pricing/order logic remains server validated.

@@ -41,7 +41,8 @@ return [
         // Leave empty for automatic detection in XAMPP/subfolders; set BENAKI_BASE_URL for production/rewrite deployments.
         'base_url' => rtrim(benaki_env('BENAKI_BASE_URL',''),'/'),
         'timezone' => 'Africa/Lagos',
-        'upload_max_bytes' => 5 * 1024 * 1024,
+        'upload_max_bytes' => 15 * 1024 * 1024,
+        'ffmpeg_bin' => benaki_env('BENAKI_FFMPEG_BIN', 'ffmpeg'),
     ],
     'business' => [
         'name' => 'Benaki Fabrics', 'tagline' => 'Finest Quality Textiles',
